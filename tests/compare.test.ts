@@ -8,7 +8,13 @@ import { table } from "./helpers";
 function run(
   left: ParsedSheet,
   right: ParsedSheet,
-  options: { dateMatching?: boolean; reference?: string; amount?: string; date?: string | null } = {},
+  options: {
+    dateMatching?: boolean;
+    dateFormat?: "auto" | "dmy" | "mdy";
+    reference?: string;
+    amount?: string;
+    date?: string | null;
+  } = {},
 ) {
   const reference = options.reference ?? "reference";
   const amount = options.amount ?? "amount";
@@ -23,6 +29,7 @@ function run(
     amountB: amount,
     dateB: date,
     dateMatching: options.dateMatching ?? false,
+    dateFormat: options.dateFormat ?? "auto",
   });
 }
 
@@ -31,7 +38,7 @@ describe("compare", () => {
     const result = run(table(["reference", "amount"], [["INV-1", 100]]), table(["reference", "amount"], [["INV-1", 100]]));
     expect(result.matched).toHaveLength(1);
     expect(result.exceptions).toHaveLength(0);
-    expect(summaryNote(result)).toMatch(/All rows matched/);
+    expect(summaryNote(result)).toBe("allMatched");
   });
 
   it("matches references that differ by whitespace, case, and punctuation", () => {
@@ -108,20 +115,22 @@ describe("compare", () => {
     const left = table(["reference", "amount", "date"], [["A-1", 10, "2026-02-01"]]);
     const right = table(["reference", "amount", "date"], [["A-1", 10, "03/02/2026"]]);
     expect(run(left, right).matched).toHaveLength(1);
-    const dated = run(left, right, { dateMatching: true });
+    const dated = run(left, right, { dateMatching: true, dateFormat: "dmy" });
     expect(dated.matched).toHaveLength(0);
     expect(dated.exceptions[0].status).toBe("DATE_MISMATCH");
   });
 
-  it("reports an unreadable date when date matching is on", () => {
+  it("reports an unreadable or ambiguous date when date matching is on", () => {
     const left = table(["reference", "amount", "date"], [["A-1", 10, "next week"]]);
     const right = table(["reference", "amount", "date"], [["A-1", 10, "2026-02-01"]]);
     expect(() => run(left, right, { dateMatching: true })).toThrow(/not dates/);
+    const ambiguous = table(["reference", "amount", "date"], [["A-1", 10, "01/02/2026"]]);
+    expect(() => run(ambiguous, right, { dateMatching: true, dateFormat: "auto" })).toThrow(/not dates/);
   });
 
   it("says when nothing matched", () => {
     const result = run(table(["reference", "amount"], [["A-1", 10]]), table(["reference", "amount"], [["B-1", 10]]));
-    expect(summaryNote(result)).toMatch(/No rows matched/);
+    expect(summaryNote(result)).toBe("noneMatched");
   });
 
   it("uses manually chosen columns", () => {

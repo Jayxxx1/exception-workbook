@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="%HTML_LANG%">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>%SITE_TITLE%</title>
+    <meta name="description" content="%SITE_DESCRIPTION%" />
+    <meta name="robots" content="index,follow" />
+    <meta name="theme-color" content="#f3efe6" />
+    <link rel="canonical" href="%SITE_ORIGIN%%CANONICAL_PATH%" />
+    %HREFLANG_BLOCK%
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="%SITE_NAME%" />
+    <meta property="og:locale" content="%OG_LOCALE%" />
+    <meta property="og:title" content="%SITE_TITLE%" />
+    <meta property="og:description" content="%SITE_DESCRIPTION%" />
+    <meta property="og:url" content="%SITE_ORIGIN%%CANONICAL_PATH%" />
+    <meta property="og:image" content="%SITE_ORIGIN%/og.png" />
+    <meta property="og:image:alt" content="Compare two Excel files and find matches, mismatches, and unmatched rows" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="%SITE_TITLE%" />
+    <meta name="twitter:description" content="%SITE_DESCRIPTION%" />
+    <meta name="twitter:image" content="%SITE_ORIGIN%/og.png" />
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "WebApplication",
+        "name": "%SITE_NAME%",
+        "url": "%SITE_ORIGIN%/th/",
+        "description": "%SITE_DESCRIPTION%",
+        "applicationCategory": "BusinessApplication",
+        "operatingSystem": "Web",
+        "browserRequirements": "Requires JavaScript. Files are processed locally in the browser.",
+        "inLanguage": ["th", "en"],
+        "isAccessibleForFree": true,
+        "offers": {
+          "@type": "Offer",
+          "price": "0",
+          "priceCurrency": "USD"
+        }
+      }
+    </script>
+    <style>
+      body { margin: 0; background: #f3efe6; color: #1e1b16; font-family: Georgia, "Noto Sans Thai", Tahoma, sans-serif; }
+      main { max-width: 1120px; margin: 0 auto; padding: 28px 24px; }
+      h1 { font-size: clamp(2.4rem, 5vw, 4.15rem); line-height: 0.96; letter-spacing: -0.035em; max-width: 12em; }
+    </style>
+  </head>
+  <body>
+    <main id="root">
+      <article>
+        <p>Exception Workbook</p>
+        <h1>%SITE_H1%</h1>
+        <p>%SITE_DESCRIPTION%</p>
+        <p>%SITE_PRIVACY%</p>
+        <h2>เปรียบเทียบอะไรได้บ้าง</h2>
+        <p>ใบสั่งกับยอดชำระ ใบแจ้งหนี้กับรายการโอน สองไฟล์ CSV รายชื่อลูกค้า สต็อก และสเปรดชีตบัญชี</p>
+        <h2>วิธีใช้</h2>
+        <ol>
+          <li>อัปโหลดไฟล์ Excel หรือ CSV สองไฟล์</li>
+          <li>เลือกคอลัมน์อ้างอิงและยอดเงิน</li>
+          <li>เปรียบเทียบไฟล์</li>
+          <li>ดาวน์โหลดรายงาน Exception เป็น Excel</li>
+        </ol>
+      </article>
+    </main>
+    <noscript>
+      <p>หน้านี้เปรียบเทียบสเปรดชีตในเบราว์เซอร์ เปิด JavaScript เพื่อโหลดไฟล์และดาวน์โหลดสมุดงาน ไม่มีการอัปโหลด</p>
+    </noscript>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

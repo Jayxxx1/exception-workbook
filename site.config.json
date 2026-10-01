@@ -1,8 +1,12 @@
 {
-  "origin": "https://example.com",
+  "origin": "https://exception-workbook.test",
   "name": "Exception Workbook",
   "title": "Compare Two Excel Files and Find Unmatched Rows",
   "h1": "Compare two Excel files and find unmatched rows",
-  "description": "Compare two Excel or CSV files by reference and amount, then download an exception workbook of matches, mismatches, and unmatched rows.",
-  "privacy": "Your files are processed in your browser and are not uploaded."
+  "description": "Compare two Excel or CSV files by reference and amount, then download an Excel report of matches, mismatches, and unmatched rows.",
+  "privacy": "Your files are processed in your browser and never uploaded.",
+  "titleTh": "เปรียบเทียบไฟล์ Excel สองไฟล์และหาแถวที่ไม่ตรง",
+  "h1Th": "เปรียบเทียบไฟล์ Excel สองไฟล์และหาแถวที่ไม่ตรง",
+  "descriptionTh": "เปรียบเทียบไฟล์ Excel หรือ CSV สองไฟล์ด้วยรหัสอ้างอิงและยอดเงิน แล้วดาวน์โหลดรายงาน Excel ของแถวที่ตรง ไม่ตรง และมีแค่ฝั่งเดียว",
+  "privacyTh": "ไฟล์ของคุณถูกประมวลผลในเบราว์เซอร์ และไม่ถูกอัปโหลด"
 }

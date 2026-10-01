@@ -1,7 +1,8 @@
 import { UserFacingError, rowPhrase } from "./errors";
 import { MAX_DATA_ROWS, tooManyRowsMessage } from "./limits";
-import { normalizeReference, parseAmount, parseDateKey } from "./normalize";
+import { normalizeReference, parseAmount, parseDateValue, type DateFormat } from "./normalize";
 import type { CellValue, ClassifiedRow, Comparison, DataRow, ParsedSheet } from "./types";
+import { STATUS_LABELS } from "./i18n";
 
 export type CompareInput = {
   fileA: ParsedSheet;
@@ -13,6 +14,7 @@ export type CompareInput = {
   amountB: string;
   dateB: string | null;
   dateMatching: boolean;
+  dateFormat?: DateFormat;
 };
 
 type SideRow = {
@@ -53,9 +55,13 @@ function extrasOf(row: DataRow, headers: string[], skip: Set<string>): Record<st
   return extras;
 }
 
-function dateKeyOf(cell: CellValue | undefined): string | null {
+function dateKeyOf(cell: CellValue | undefined, format: DateFormat): string | null {
   if (!cell) return null;
-  return parseDateKey(cell.display) ?? (cell.isoDate ? parseDateKey(cell.isoDate) : null);
+  return (
+    parseDateValue(cell.raw, format) ??
+    parseDateValue(cell.display, format) ??
+    (cell.isoDate ? parseDateValue(cell.isoDate, "auto") : null)
+  );
 }
 
 function readSide(
@@ -64,6 +70,7 @@ function readSide(
   amountHeader: string,
   dateHeader: string | null,
   dateMatching: boolean,
+  dateFormat: DateFormat,
   label: string,
 ): { rows: SideRow[]; total: bigint } {
   const blankRows: number[] = [];
@@ -89,7 +96,7 @@ function readSide(
     let dateKey: string | null = null;
     const dateDisplay = dateCell?.display ?? "";
     if (dateHeader) {
-      dateKey = dateKeyOf(dateCell);
+      dateKey = dateKeyOf(dateCell, dateFormat);
       if (dateMatching && !dateKey) badDateRows.push(row.rowNumber);
     }
 
@@ -210,8 +217,9 @@ export function compareSheets(input: CompareInput): Comparison {
   if (input.dateA) requireHeader(input.fileA, input.dateA, "File A");
   if (input.dateB) requireHeader(input.fileB, input.dateB, "File B");
 
-  const sideA = readSide(input.fileA, input.referenceA, input.amountA, input.dateA, input.dateMatching, "File A");
-  const sideB = readSide(input.fileB, input.referenceB, input.amountB, input.dateB, input.dateMatching, "File B");
+  const dateFormat = input.dateFormat ?? "auto";
+  const sideA = readSide(input.fileA, input.referenceA, input.amountA, input.dateA, input.dateMatching, dateFormat, "File A");
+  const sideB = readSide(input.fileB, input.referenceB, input.amountB, input.dateB, input.dateMatching, dateFormat, "File B");
   const groupsA = group(sideA.rows);
   const groupsB = group(sideB.rows);
   const keys = [...new Set([...groupsA.keys(), ...groupsB.keys()])].sort((a, b) => (a < b ? -1 : a > b ? 1 : 0));
@@ -280,22 +288,12 @@ export function compareSheets(input: CompareInput): Comparison {
   };
 }
 
-export function summaryNote(result: Comparison): string | null {
+export function summaryNote(result: Comparison): "allMatched" | "noneMatched" | null {
   const leftovers = result.exceptions.length + result.onlyA.length + result.onlyB.length + result.duplicates.length;
-  if (result.matched.length > 0 && leftovers === 0) {
-    return "All rows matched. Every reference agreed, every amount agreed, and no duplicates were left over.";
-  }
-  if (result.matched.length === 0) {
-    return "No rows matched. A match needs the same reference and the same amount. The workbook lists the rest.";
-  }
+  if (result.matched.length > 0 && leftovers === 0) return "allMatched";
+  if (result.matched.length === 0) return "noneMatched";
   return null;
 }
 
-export const STATUS_LABEL: Record<ClassifiedRow["status"], string> = {
-  MATCHED: "MATCHED",
-  AMOUNT_MISMATCH: "AMOUNT MISMATCH",
-  ONLY_IN_A: "ONLY IN FILE A",
-  ONLY_IN_B: "ONLY IN FILE B",
-  DUPLICATE: "DUPLICATE",
-  DATE_MISMATCH: "DATE MISMATCH",
-};
+/** English labels for presentation and tests. Thai labels live in i18n. */
+export const STATUS_LABEL = STATUS_LABELS.en;

@@ -1,5 +1,13 @@
 import { describe, expect, it } from "vitest";
-import { formatMoney, normalizeReference, parseAmount, parseDateKey } from "../src/normalize";
+import {
+  excelSerialFromDate,
+  formatMoney,
+  normalizeReference,
+  parseAmount,
+  parseDateKey,
+  parseDateValue,
+  parseExcelSerial,
+} from "../src/normalize";
 
 describe("reference normalization", () => {
   it("trims, ignores case, whitespace, and light punctuation", () => {
@@ -21,14 +29,26 @@ describe("reference normalization", () => {
 });
 
 describe("amount normalization", () => {
-  it("accepts commas, currency symbols, and numeric strings", () => {
-    expect(parseAmount("฿1,250.00")).toBe(parseAmount(1250));
+  it("accepts global currency symbols and numeric strings", () => {
+    expect(parseAmount("$1,590.00")).toBe(parseAmount(1590));
+    expect(parseAmount("€1,590.00")).toBe(parseAmount(1590));
+    expect(parseAmount("£1,590.00")).toBe(parseAmount(1590));
+    expect(parseAmount("¥1590")).toBe(parseAmount(1590));
+    expect(parseAmount("฿1,590")).toBe(parseAmount(1590));
+    expect(parseAmount("USD1,590.00")).toBe(parseAmount(1590));
+    expect(parseAmount("AUD 1,590.00")).toBe(parseAmount(1590));
+    expect(parseAmount("1 590,00")).toBe(parseAmount(1590));
     expect(parseAmount(" 1,250.50 ")).toBe(parseAmount("1250.50"));
-    expect(parseAmount("฿ 1,250.00")).toBe(1250n * 10000n);
     expect(parseAmount("(1,250.00)")).toBe(-1250n * 10000n);
     expect(parseAmount("1.250,50")).toBe(parseAmount("1250.50"));
     expect(parseAmount("１２５０")).toBe(1250n * 10000n);
     expect(parseAmount(10)).toBe(parseAmount("10.00"));
+  });
+
+  it("treats a single comma group of three digits as thousands, not a decimal", () => {
+    expect(parseAmount("1,234")).toBe(1234n * 10000n);
+    expect(parseAmount("1,234.00")).toBe(1234n * 10000n);
+    expect(parseAmount("1,23")).toBe(parseAmount("1.23"));
   });
 
   it("rejects values that are not amounts", () => {
@@ -46,10 +66,27 @@ describe("amount normalization", () => {
 });
 
 describe("dates", () => {
-  it("reads ISO and day/month/year", () => {
+  it("reads ISO dates", () => {
     expect(parseDateKey("2026-02-01")).toBe("2026-02-01");
-    expect(parseDateKey("01/02/2026")).toBe("2026-02-01");
-    expect(parseDateKey("31/02/2026")).toBeNull();
+  });
+
+  it("reads day-first and month-first when the format is explicit", () => {
+    expect(parseDateKey("01/02/2026", "dmy")).toBe("2026-02-01");
+    expect(parseDateKey("01/02/2026", "mdy")).toBe("2026-01-02");
+    expect(parseDateKey("13/02/2026", "auto")).toBe("2026-02-13");
+    expect(parseDateKey("02/13/2026", "auto")).toBe("2026-02-13");
+  });
+
+  it("rejects ambiguous slash dates in auto mode", () => {
+    expect(parseDateKey("01/02/2026", "auto")).toBeNull();
+    expect(parseDateKey("31/02/2026", "dmy")).toBeNull();
     expect(parseDateKey("February")).toBeNull();
+  });
+
+  it("reads Excel serial dates", () => {
+    const serial = excelSerialFromDate(new Date(Date.UTC(2026, 1, 1)));
+    expect(parseExcelSerial(serial)).toBe("2026-02-01");
+    expect(parseDateValue(serial, "auto")).toBe("2026-02-01");
+    expect(parseDateValue(new Date(Date.UTC(2026, 1, 1)), "auto")).toBe("2026-02-01");
   });
 });

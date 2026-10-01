@@ -1,6 +1,10 @@
 import type { DetectedColumns } from "./types";
 
 const MATCH_HINTS = [
+  "payment reference",
+  "transaction number",
+  "transaction id",
+  "transaction",
   "order number",
   "order no",
   "order id",
@@ -10,9 +14,9 @@ const MATCH_HINTS = [
   "reference number",
   "reference no",
   "reference",
-  "ref no",
   "document number",
   "document no",
+  "ref no",
   "เลขที่ใบสั่งซื้อ",
   "เลขที่ใบสั่ง",
   "เลขที่อ้างอิง",
@@ -24,6 +28,8 @@ const MATCH_HINTS = [
   "เลขที่",
   "order",
   "inv no",
+  "ref",
+  "id",
 ];
 
 const AMOUNT_HINTS = [
@@ -31,8 +37,14 @@ const AMOUNT_HINTS = [
   "total amount",
   "net amount",
   "grand total",
+  "payment",
   "amount",
   "subtotal",
+  "charge",
+  "balance",
+  "value",
+  "price",
+  "paid",
   "total",
   "ยอดเงินสุทธิ",
   "ยอดรวมทั้งสิ้น",
@@ -43,10 +55,13 @@ const AMOUNT_HINTS = [
 ];
 
 const DATE_HINTS = [
+  "transaction date",
   "invoice date",
-  "order date",
   "payment date",
+  "order date",
   "posting date",
+  "created date",
+  "created at",
   "date",
   "วันที่รับเงิน",
   "วันที่ชำระ",
@@ -54,9 +69,9 @@ const DATE_HINTS = [
   "วันที่",
 ];
 
-const MATCH_BLOCK = ["date", "วันที่", "amount", "total", "ยอดเงิน", "จำนวนเงิน", "subtotal"];
+const MATCH_BLOCK = ["date", "วันที่", "amount", "total", "ยอดเงิน", "จำนวนเงิน", "subtotal", "price", "value", "balance", "paid", "charge"];
 const AMOUNT_BLOCK = ["date", "วันที่", "qty", "quantity", "จำนวนชิ้น"];
-const DATE_BLOCK = ["amount", "total", "ยอดเงิน", "จำนวนเงิน"];
+const DATE_BLOCK = ["amount", "total", "ยอดเงิน", "จำนวนเงิน", "price", "value", "paid", "charge", "balance"];
 
 function normHeader(header: string): string {
   return header

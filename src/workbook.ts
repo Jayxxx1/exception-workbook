@@ -1,6 +1,6 @@
 import * as XLSX from "xlsx";
-import { STATUS_LABEL } from "./compare";
 import { UserFacingError } from "./errors";
+import { SHEET_NAMES, statusLabel, type Locale } from "./i18n";
 import { minorToNumber } from "./normalize";
 import type { ClassifiedRow, Comparison } from "./types";
 
@@ -118,12 +118,12 @@ function matchedRows(rows: ClassifiedRow[]): Array<Array<string | number>> {
   ];
 }
 
-function exceptionRows(rows: ClassifiedRow[]): Array<Array<string | number>> {
+function exceptionRows(rows: ClassifiedRow[], locale: Locale): Array<Array<string | number>> {
   const header = ["Status", "Reference (A)", "Reference (B)", "Amount (A)", "Amount (B)", "Difference", "Date (A)", "Date (B)", "Row (A)", "Row (B)"];
   return [
     header,
     ...rows.map((row) => [
-      STATUS_LABEL[row.status],
+      statusLabel(locale, row.status),
       row.referenceA,
       row.referenceB,
       row.amountADisplay,
@@ -175,15 +175,16 @@ function duplicateRows(rows: ClassifiedRow[]): Array<Array<string | number>> {
   ];
 }
 
-export function buildWorkbook(comparison: Comparison): XLSX.WorkBook {
+export function buildWorkbook(comparison: Comparison, locale: Locale = "en"): XLSX.WorkBook {
+  const names = SHEET_NAMES[locale];
   const workbook = XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(workbook, sheetFromRows(summaryRows(comparison)), "Summary");
-  XLSX.utils.book_append_sheet(workbook, sheetFromRows(matchedRows(comparison.matched)), "Matched");
-  XLSX.utils.book_append_sheet(workbook, sheetFromRows(exceptionRows(comparison.exceptions)), "Exceptions");
-  XLSX.utils.book_append_sheet(workbook, sheetFromRows(onlyRows(comparison.onlyA, "A")), "Only in A");
-  XLSX.utils.book_append_sheet(workbook, sheetFromRows(onlyRows(comparison.onlyB, "B")), "Only in B");
+  XLSX.utils.book_append_sheet(workbook, sheetFromRows(summaryRows(comparison)), names.summary);
+  XLSX.utils.book_append_sheet(workbook, sheetFromRows(matchedRows(comparison.matched)), names.matched);
+  XLSX.utils.book_append_sheet(workbook, sheetFromRows(exceptionRows(comparison.exceptions, locale)), names.exceptions);
+  XLSX.utils.book_append_sheet(workbook, sheetFromRows(onlyRows(comparison.onlyA, "A")), names.onlyA);
+  XLSX.utils.book_append_sheet(workbook, sheetFromRows(onlyRows(comparison.onlyB, "B")), names.onlyB);
   if (comparison.duplicates.length > 0) {
-    XLSX.utils.book_append_sheet(workbook, sheetFromRows(duplicateRows(comparison.duplicates)), "Duplicates");
+    XLSX.utils.book_append_sheet(workbook, sheetFromRows(duplicateRows(comparison.duplicates)), names.duplicates);
   }
   workbook.Props = { Title: "Exception Workbook", Subject: "Spreadsheet comparison" };
   return workbook;
@@ -196,8 +197,8 @@ export function toUint8Array(data: unknown): Uint8Array {
   throw new UserFacingError("The workbook could not be created.");
 }
 
-export function buildWorkbookBytes(comparison: Comparison): Uint8Array {
-  const written = XLSX.write(buildWorkbook(comparison), { bookType: "xlsx", type: "array", compression: true });
+export function buildWorkbookBytes(comparison: Comparison, locale: Locale = "en"): Uint8Array {
+  const written = XLSX.write(buildWorkbook(comparison, locale), { bookType: "xlsx", type: "array", compression: true });
   return toUint8Array(written);
 }
 

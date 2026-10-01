@@ -23,6 +23,24 @@ describe("header detection", () => {
     });
   });
 
+  it("detects English order id, amount, and payment reference headers", () => {
+    expect(detectColumns(["Order ID", "Customer", "Amount", "Date"])).toEqual({
+      reference: "Order ID",
+      amount: "Amount",
+      date: "Date",
+    });
+    expect(detectColumns(["Payment Reference", "Payer", "Amount", "Date"])).toEqual({
+      reference: "Payment Reference",
+      amount: "Amount",
+      date: "Date",
+    });
+    expect(detectColumns(["Transaction ID", "Paid", "Created At"])).toEqual({
+      reference: "Transaction ID",
+      amount: "Paid",
+      date: "Created At",
+    });
+  });
+
   it("does not treat inventory as a reference", () => {
     expect(detectColumns(["Inventory", "Total"])).toEqual({
       reference: null,

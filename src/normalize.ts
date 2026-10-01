@@ -1,4 +1,7 @@
+export type DateFormat = "auto" | "dmy" | "mdy";
+
 const LIGHT_PUNCTUATION = /[\s\u00A0\-_\.\/\\#,;:'"`~!?()[\]{}+|]+/gu;
+const CURRENCY_CODES = /^(?:THB|USD|EUR|GBP|JPY|AUD|CAD|SGD|NZD|INR|MYR|PHP|HKD|CNY|CHF|SEK|NOK|DKK|ZAR|MXN|BRL|KRW|IDR|VND)/i;
 
 export function normalizeReference(value: unknown): string {
   if (typeof value === "number") {
@@ -29,11 +32,11 @@ function numberToMinor(value: number): bigint | null {
 }
 
 function stringToMinor(input: string): bigint | null {
-  let text = input.normalize("NFKC").replace(/[\u00A0\u200B-\u200D\uFEFF]/g, "").trim();
+  let text = input.normalize("NFKC").replace(/[\u00A0\u202F\u200B-\u200D\uFEFF]/g, "").trim();
   if (!text) return null;
   text = text.replace(/\s+/g, "");
   text = text.replace(/บาท$/i, "");
-  text = text.replace(/^(?:THB|USD|EUR|GBP|JPY)/i, "");
+  text = text.replace(CURRENCY_CODES, "");
   text = text.replace(/[฿$€£¥₩₽₹]/g, "");
   if (!text) return null;
 
@@ -87,18 +90,57 @@ export function minorToNumber(minor: bigint): number {
   return negative ? -(whole + fraction) : whole + fraction;
 }
 
-export function parseDateKey(value: string): string | null {
-  const text = value.normalize("NFKC").trim();
-  if (!text) return null;
-  const iso = /^(\d{4})-(\d{2})-(\d{2})$/.exec(text);
-  const dayFirst = /^(\d{1,2})[\/.\-](\d{1,2})[\/.\-](\d{4})$/.exec(text);
-  const year = iso ? Number(iso[1]) : dayFirst ? Number(dayFirst[3]) : NaN;
-  const month = iso ? Number(iso[2]) : dayFirst ? Number(dayFirst[2]) : NaN;
-  const day = iso ? Number(iso[3]) : dayFirst ? Number(dayFirst[1]) : NaN;
-  if (!iso && !dayFirst) return null;
+function pad(value: number): string {
+  return String(value).padStart(2, "0");
+}
+
+function ymd(year: number, month: number, day: number): string | null {
   if (year < 1900 || year > 2100) return null;
   const date = new Date(Date.UTC(year, month - 1, day));
   if (date.getUTCFullYear() !== year || date.getUTCMonth() !== month - 1 || date.getUTCDate() !== day) return null;
-  const pad = (part: number) => String(part).padStart(2, "0");
   return `${year}-${pad(month)}-${pad(day)}`;
+}
+
+function fromParts(first: number, second: number, year: number, format: DateFormat): string | null {
+  if (format === "dmy") return ymd(year, second, first);
+  if (format === "mdy") return ymd(year, first, second);
+  if (first > 12 && second <= 12) return ymd(year, second, first);
+  if (second > 12 && first <= 12) return ymd(year, first, second);
+  if (first === second) return ymd(year, first, second);
+  return null;
+}
+
+/** Excel serial day count for the UTC calendar day of a Date. */
+export function excelSerialFromDate(date: Date): number {
+  return Math.floor(Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate()) / 86400000) + 25569;
+}
+
+export function parseExcelSerial(value: number): string | null {
+  if (!Number.isFinite(value) || !Number.isInteger(value)) return null;
+  if (value < 1 || value > 2958465) return null;
+  const utc = new Date(Math.round((value - 25569) * 86400000));
+  return ymd(utc.getUTCFullYear(), utc.getUTCMonth() + 1, utc.getUTCDate());
+}
+
+export function parseDateKey(value: string, format: DateFormat = "auto"): string | null {
+  const text = value.normalize("NFKC").trim();
+  if (!text) return null;
+  const iso = /^(\d{4})-(\d{2})-(\d{2})$/.exec(text);
+  if (iso) return ymd(Number(iso[1]), Number(iso[2]), Number(iso[3]));
+  const slash = /^(\d{1,2})[\/.\-](\d{1,2})[\/.\-](\d{4})$/.exec(text);
+  if (!slash) return null;
+  return fromParts(Number(slash[1]), Number(slash[2]), Number(slash[3]), format);
+}
+
+export function parseDateValue(value: unknown, format: DateFormat = "auto"): string | null {
+  if (value instanceof Date) {
+    if (Number.isNaN(value.getTime())) return null;
+    return ymd(value.getUTCFullYear(), value.getUTCMonth() + 1, value.getUTCDate());
+  }
+  if (typeof value === "number") return parseExcelSerial(value);
+  if (typeof value !== "string") return null;
+  const fromText = parseDateKey(value, format);
+  if (fromText) return fromText;
+  if (/^\d+$/.test(value.trim())) return parseExcelSerial(Number(value.trim()));
+  return null;
 }

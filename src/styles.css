@@ -51,6 +51,34 @@ button:disabled { cursor: not-allowed; opacity: 0.45; }
   border-bottom: 1px solid var(--line);
 }
 
+.top-right {
+  display: grid;
+  justify-items: end;
+  gap: 6px;
+}
+
+.lang {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+.lang-btn {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--muted);
+}
+
+.lang-btn.is-active {
+  color: var(--ink);
+  font-weight: 650;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
 .wordmark {
   margin: 0;
   font-size: 0.78rem;
@@ -180,13 +208,29 @@ h1 {
   margin-top: 12px;
 }
 
-.fields label, .date-rule {
+.fields label,
+.field-label,
+.date-rule {
   display: grid;
   gap: 4px;
   font-size: 0.82rem;
   font-weight: 650;
   letter-spacing: 0.04em;
   text-transform: uppercase;
+}
+
+.field-label select,
+.date-rule {
+  font-weight: 450;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+.control-grid {
+  display: grid;
+  grid-template-columns: 1.2fr 1fr;
+  gap: 12px;
+  align-items: end;
 }
 
 select {
@@ -245,6 +289,12 @@ select {
 }
 
 .button.primary:hover:not(:disabled) { background: var(--accent-dark); }
+
+.button.quiet {
+  border-color: var(--line);
+  color: var(--muted);
+  background: transparent;
+}
 
 .alert, .note {
   margin: 14px 0 0;
@@ -318,6 +368,35 @@ select {
   color: var(--muted);
 }
 
+.seo-block {
+  margin-top: 28px;
+  padding-top: 18px;
+  border-top: 1px solid var(--line);
+  max-width: 68ch;
+}
+
+.seo-block h2 {
+  margin: 0 0 8px;
+  font-family: var(--serif);
+  font-size: 1.45rem;
+  font-weight: 600;
+}
+
+.seo-block h3 {
+  margin: 14px 0 4px;
+  font-size: 1rem;
+}
+
+.seo-block p,
+.seo-block ol {
+  margin: 0 0 8px;
+  color: var(--muted);
+}
+
+.seo-block ol {
+  padding-left: 1.2rem;
+}
+
 .footer {
   margin-top: 28px;
   padding-top: 14px;
@@ -339,7 +418,9 @@ select {
 
 @media (max-width: 800px) {
   .page { padding: 18px 14px 48px; }
-  .top, .files, .steps, .actions { display: grid; grid-template-columns: 1fr; }
+  .top, .top-right, .files, .steps, .actions, .control-grid { display: grid; grid-template-columns: 1fr; }
+  .top-right { justify-items: start; }
   .actions .button { width: 100%; }
   h1 { max-width: none; }
+  .drop strong, .file-meta, .preview td { overflow-wrap: anywhere; }
 }

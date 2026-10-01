@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en">
+<html lang="%HTML_LANG%">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -7,15 +7,17 @@
     <meta name="description" content="%SITE_DESCRIPTION%" />
     <meta name="robots" content="index,follow" />
     <meta name="theme-color" content="#f3efe6" />
-    <link rel="canonical" href="%SITE_ORIGIN%/" />
+    <link rel="canonical" href="%SITE_ORIGIN%%CANONICAL_PATH%" />
+    %HREFLANG_BLOCK%
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content="%SITE_NAME%" />
+    <meta property="og:locale" content="%OG_LOCALE%" />
     <meta property="og:title" content="%SITE_TITLE%" />
     <meta property="og:description" content="%SITE_DESCRIPTION%" />
-    <meta property="og:url" content="%SITE_ORIGIN%/" />
+    <meta property="og:url" content="%SITE_ORIGIN%%CANONICAL_PATH%" />
     <meta property="og:image" content="%SITE_ORIGIN%/og.png" />
-    <meta property="og:image:alt" content="Exception Workbook: compare two Excel files and find unmatched rows" />
+    <meta property="og:image:alt" content="Compare two Excel files and find matches, mismatches, and unmatched rows" />
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content="%SITE_TITLE%" />
     <meta name="twitter:description" content="%SITE_DESCRIPTION%" />
@@ -30,6 +32,7 @@
         "applicationCategory": "BusinessApplication",
         "operatingSystem": "Web",
         "browserRequirements": "Requires JavaScript. Files are processed locally in the browser.",
+        "inLanguage": ["en", "th"],
         "isAccessibleForFree": true,
         "offers": {
           "@type": "Offer",
@@ -51,12 +54,14 @@
         <h1>%SITE_H1%</h1>
         <p>%SITE_DESCRIPTION%</p>
         <p>%SITE_PRIVACY%</p>
-        <p lang="th">หัวตารางภาษาไทย เช่น เลขที่ หรือ ยอดเงิน จะถูกเลือกให้อัตโนมัติ และเปลี่ยนเองได้เสมอ</p>
+        <h2>What can you compare?</h2>
+        <p>Orders vs payments, invoices vs transactions, two CSV exports, customer lists, inventory lists, and accounting spreadsheets.</p>
+        <h2>How it works</h2>
         <ol>
-          <li>Load file A and file B (.xlsx, .xls, or .csv).</li>
-          <li>Confirm the reference column, the amount column, and an optional date column.</li>
-          <li>Compare. A match is the same reference and the same amount. Rows are not fuzzy-matched.</li>
-          <li>Download an exception workbook of matches, amount mismatches, unmatched rows, and duplicates.</li>
+          <li>Upload two Excel or CSV files.</li>
+          <li>Choose the reference and amount columns.</li>
+          <li>Compare the files.</li>
+          <li>Download the Excel exception report.</li>
         </ol>
       </article>
     </main>
