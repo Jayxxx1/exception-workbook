@@ -1,0 +1,3 @@
+# Keep locale and static files as real files. Do not send everything to index.html.
+/th  /th/  301
+/th/  /th/index.html  200

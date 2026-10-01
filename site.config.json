@@ -1,5 +1,5 @@
 {
-  "origin": "https://exception-workbook.test",
+  "origin": "",
   "name": "Exception Workbook",
   "title": "Compare Two Excel Files and Find Unmatched Rows",
   "h1": "Compare two Excel files and find unmatched rows",

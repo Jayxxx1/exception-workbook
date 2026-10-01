@@ -2,7 +2,7 @@
 
 Compare two spreadsheets and download an exception workbook. Load file A and file B, match rows on a reference and an amount, and download one `.xlsx` of what matched and what did not.
 
-English is the default. Thai is available at `/th/`. It is a browser utility, not an editor, account system, or hosted database.
+English is the default at `/`. Thai is available at `/th/`. It is a browser utility, not an editor, account system, or hosted database.
 
 Search volume for the wording below is **UNKNOWN**. Nothing in this repository estimates traffic or revenue.
 
@@ -36,16 +36,7 @@ The first worksheet in each workbook is used. Row 1 is the header. Fully blank r
 
 ## Workbook sheets
 
-Default English names:
-
-- **Summary**
-- **Matched**
-- **Exceptions**
-- **Only in A**
-- **Only in B**
-- **Duplicates** (only if any exist)
-
-When the Thai locale is selected, sheet names and status labels in the download follow the Thai UI. Source cell text is preserved.
+Default English names: Summary, Matched, Exceptions, Only in A, Only in B, and Duplicates when needed. Thai locale downloads use Thai sheet names. Source cell text is preserved.
 
 ## Privacy
 
@@ -53,7 +44,7 @@ Files are read with SheetJS in the browser and never uploaded. Sample buttons fe
 
 The page states: “Your files are processed in your browser and never uploaded.”
 
-Analytics is off unless you set `globalThis.__EXCEPTION_WORKBOOK_ANALYTICS__` to a function. That function receives only an event name: `page_view`, `demo_started`, `file_a_loaded`, `file_b_loaded`, `comparison_started`, `comparison_completed`, `export_downloaded`, `comparison_failed`. Filenames, references, and amounts are not sent.
+Analytics is off unless you set `globalThis.__EXCEPTION_WORKBOOK_ANALYTICS__` to a function. That function receives only an event name. Filenames, references, and amounts are not sent.
 
 ## Formats and limits
 
@@ -63,10 +54,10 @@ Analytics is off unless you set `globalThis.__EXCEPTION_WORKBOOK_ANALYTICS__` to
 
 ## Sample files
 
-- `public/sample-orders.xlsx` / `public/sample-payments.xlsx` — English/international fake data (default demo)
-- `public/sample-orders-th.xlsx` / `public/sample-payments-th.xlsx` — Thai-header fake data (secondary demo)
+- `sample-orders.xlsx` / `sample-payments.xlsx` — English/international fake data (default demo)
+- `sample-orders-th.xlsx` / `sample-payments-th.xlsx` — Thai-header fake data
 
-Both pairs have 47 and 43 data rows and the same classification shape: 30 matches, 6 amount mismatches, 8 only in A, 5 only in B, 5 duplicate rows.
+Both pairs classify as: 30 matches, 6 amount mismatches, 8 only in A, 5 only in B, 5 duplicate rows.
 
 ```bash
 npm run samples
@@ -74,22 +65,23 @@ npm run samples
 
 ## Language
 
-- `/` — English (default, `lang="en"`)
+- `/` — English (`lang="en"`)
 - `/th/` — Thai (`lang="th"`)
 - Switch: **English | ไทย**
-- Reloading `/` stays English. Matching logic does not depend on locale.
+- Matching logic does not depend on locale.
 
 ## Commands
 
 ```bash
 npm install
 npm test
-npm run dev
-npm run build
-npm run preview -- --host 127.0.0.1 --port 4173
+SITE_ORIGIN=http://127.0.0.1:4173 npm run site-files
+SITE_ORIGIN=http://127.0.0.1:4173 npm run build
+SITE_ORIGIN=http://127.0.0.1:4173 npm run preview -- --host 127.0.0.1 --port 4173
 npm run samples
-npm run site-files
 ```
+
+`npm run build` and `npm run site-files` fail if the public origin is empty, `example.com`, or a `.test` host. Set `SITE_ORIGIN` or `site.config.json` `origin`.
 
 ## SEO
 
@@ -100,32 +92,80 @@ npm run site-files
 | Description | Compare two Excel or CSV files by reference and amount, then download an Excel report of matches, mismatches, and unmatched rows. |
 | English canonical | `{origin}/` |
 | Thai canonical | `{origin}/th/` |
+| hreflang | `en`, `th`, `x-default` → English `/` |
 
 Search volume is **UNKNOWN**.
 
-`site.config.json` holds the public origin. The committed value is `https://exception-workbook.test` (a `.test` placeholder for local/config checks). **`example.com` is rejected** by `assertProductionOrigin()` during `npm run site-files` and `npm run build`.
+## Production deployment checklist
 
-Before a public deploy:
+Do not invent a domain in the repository. Configure the real HTTPS origin at deploy time.
 
-1. Set `origin` in `site.config.json` to your real `https` origin (no trailing slash).
-2. `npm run site-files`
-3. `npm test`
-4. `npm run build`
-5. Upload `dist/` so `/` and `/th/` both serve their `index.html`, and static files under `/` remain reachable.
+1. **Configure the public origin** (no trailing slash), either:
+   - `export SITE_ORIGIN=https://your-real-domain.tld`
+   - or set `"origin": "https://your-real-domain.tld"` in `site.config.json`
+2. **Generate site files**
+   ```bash
+   npm run site-files
+   ```
+3. **Run tests**
+   ```bash
+   npm test
+   ```
+4. **Build**
+   ```bash
+   npm run build
+   ```
+5. **Upload `dist/`** to any static host so these paths are real files:
+   - `/` → `dist/index.html`
+   - `/th/` → `dist/th/index.html`
+   - `/robots.txt`
+   - `/sitemap.xml`
+   - `/favicon.svg`
+   - `/og.png`
+   - `/sample-orders.xlsx`
+   - `/sample-payments.xlsx`
+   - `/sample-orders-th.xlsx`
+   - `/sample-payments-th.xlsx`
+   - `/assets/*`
+6. **Do not** configure a catch-all SPA rewrite that sends `/th/`, `.xlsx`, `robots.txt`, or `sitemap.xml` to the English `index.html`.
+7. **Verify in a browser** after deploy:
+   - open `/` and `/th/`
+   - view source: canonical, hreflang, title, one H1, `lang`
+   - open `/robots.txt` and `/sitemap.xml` and confirm they use the real HTTPS origin
+   - open each sample `.xlsx` URL directly
+   - run **Try with sample files**, confirm counts, download the workbook
+   - load a `.txt` and confirm a plain-language error
+   - in DevTools Network, confirm user spreadsheet files are not uploaded
 
-## Deploy
+### Exact command sequence
 
 ```bash
 cd /agent/repos/exception-workbook
-# edit site.config.json origin to the real https origin
 npm ci
+export SITE_ORIGIN=https://your-real-domain.tld
 npm run site-files
 npm test
 npm run build
-# upload dist/ to any static host
+# upload the contents of dist/ to the static host
 ```
 
-No server, environment variable, database, auth, payments, ads, or outreach tooling.
+### Static hosting notes
+
+- Serve over **HTTPS**.
+- `public/_headers` is copied into `dist/` for hosts that honor Netlify-style headers (CSP, nosniff, cache for `/assets/*`, MIME hints for `.xlsx`).
+- `public/_redirects` keeps `/th` → `/th/` without a global SPA fallback.
+- Equivalent nginx ideas: TLS termination; `add_header X-Content-Type-Options nosniff`; serve `/th/index.html` for `/th/`; do not `try_files` every unknown path to `/index.html`.
+- CSP in `_headers` allows only same-origin scripts/styles/images and `connect-src 'self'` (needed for public sample downloads). There are no third-party analytics or font CDNs in the app.
+- Inline critical CSS in the HTML shell needs `style-src 'self' 'unsafe-inline'`.
+
+### Local preview (not production)
+
+```bash
+export SITE_ORIGIN=http://127.0.0.1:4173
+npm run site-files
+npm run build
+npm run preview -- --host 127.0.0.1 --port 4173
+```
 
 ## Later limit
 
