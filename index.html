@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>%SITE_TITLE%</title>
+    <meta name="description" content="%SITE_DESCRIPTION%" />
+    <meta name="robots" content="index,follow" />
+    <meta name="theme-color" content="#f3efe6" />
+    <link rel="canonical" href="%SITE_ORIGIN%/" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="%SITE_NAME%" />
+    <meta property="og:title" content="%SITE_TITLE%" />
+    <meta property="og:description" content="%SITE_DESCRIPTION%" />
+    <meta property="og:url" content="%SITE_ORIGIN%/" />
+    <meta property="og:image" content="%SITE_ORIGIN%/og.png" />
+    <meta property="og:image:alt" content="Exception Workbook: compare two Excel files and find unmatched rows" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="%SITE_TITLE%" />
+    <meta name="twitter:description" content="%SITE_DESCRIPTION%" />
+    <meta name="twitter:image" content="%SITE_ORIGIN%/og.png" />
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "WebApplication",
+        "name": "%SITE_NAME%",
+        "url": "%SITE_ORIGIN%/",
+        "description": "%SITE_DESCRIPTION%",
+        "applicationCategory": "BusinessApplication",
+        "operatingSystem": "Web",
+        "browserRequirements": "Requires JavaScript. Files are processed locally in the browser.",
+        "isAccessibleForFree": true,
+        "offers": {
+          "@type": "Offer",
+          "price": "0",
+          "priceCurrency": "USD"
+        }
+      }
+    </script>
+    <style>
+      body { margin: 0; background: #f3efe6; color: #1e1b16; font-family: Georgia, "Noto Sans Thai", Tahoma, sans-serif; }
+      main { max-width: 1120px; margin: 0 auto; padding: 28px 24px; }
+      h1 { font-size: clamp(2.4rem, 5vw, 4.15rem); line-height: 0.96; letter-spacing: -0.035em; max-width: 12em; }
+    </style>
+  </head>
+  <body>
+    <main id="root">
+      <article>
+        <p>Exception Workbook</p>
+        <h1>%SITE_H1%</h1>
+        <p>%SITE_DESCRIPTION%</p>
+        <p>%SITE_PRIVACY%</p>
+        <p lang="th">หัวตารางภาษาไทย เช่น เลขที่ หรือ ยอดเงิน จะถูกเลือกให้อัตโนมัติ และเปลี่ยนเองได้เสมอ</p>
+        <ol>
+          <li>Load file A and file B (.xlsx, .xls, or .csv).</li>
+          <li>Confirm the reference column, the amount column, and an optional date column.</li>
+          <li>Compare. A match is the same reference and the same amount. Rows are not fuzzy-matched.</li>
+          <li>Download an exception workbook of matches, amount mismatches, unmatched rows, and duplicates.</li>
+        </ol>
+      </article>
+    </main>
+    <noscript>
+      <p>This page compares two spreadsheets in your browser. Enable JavaScript to load files and download the workbook. Nothing is uploaded.</p>
+    </noscript>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+  <rect width="1200" height="630" fill="#f3efe6"/>
+  <rect x="72" y="72" width="1056" height="486" fill="#fffdf8" stroke="#1e1b16" stroke-width="3"/>
+  <rect x="72" y="72" width="16" height="486" fill="#0e6b62"/>
+  <text x="120" y="180" font-family="Inter, Liberation Sans, sans-serif" font-size="28" letter-spacing="4" fill="#0e6b62">EXCEPTION WORKBOOK</text>
+  <text x="120" y="300" font-family="Liberation Serif, Georgia, serif" font-size="68" fill="#1e1b16">Compare two Excel files</text>
+  <text x="120" y="384" font-family="Liberation Serif, Georgia, serif" font-size="68" fill="#1e1b16">and find unmatched rows.</text>
+  <text x="120" y="480" font-family="Inter, Liberation Sans, sans-serif" font-size="28" fill="#5e584e">Reference and amount. Download the exceptions. Nothing is uploaded.</text>
+</svg>
